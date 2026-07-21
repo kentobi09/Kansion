@@ -146,6 +146,7 @@ class MainActivity : ComponentActivity() {
                                 queue = queue,
                                 currentSongIndex = currentSongIndex,
                                 isPlaying = isPlayingState,
+                                isSettingsClickAllowed = isSettingsClickAllowed,
                                 activePlaylist = activePlaylist,
                                 playlistSongs = playlistSongs,
                                 onSongPlay = { song -> playSongNow(song) },

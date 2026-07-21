@@ -48,6 +48,7 @@ fun MainScreen(
     queue: List<Song>,
     currentSongIndex: Int,
     isPlaying: Boolean,
+    isSettingsClickAllowed: Boolean,
     activePlaylist: Playlist?,
     playlistSongs: List<Song>,
     onSongPlay: (Song) -> Unit,
@@ -141,7 +142,11 @@ fun MainScreen(
                 
                 if (selectedTab == 0) {
                     IconButton(
-                        onClick = { showSortDialog = true },
+                        onClick = {
+                            if (isSettingsClickAllowed) {
+                                showSortDialog = true
+                            }
+                        },
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
