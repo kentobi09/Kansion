@@ -198,7 +198,9 @@ class MainActivity : ComponentActivity() {
                                     onShuffleToggle = { toggleShuffle() },
                                     onRepeatToggle = { toggleRepeat() },
                                     onAddSongToPlaylist = { playlistId, song -> addSongToPlaylist(playlistId, song) },
-                                    onCollapse = { isPlayerExpanded = false }
+                                    onCollapse = { isPlayerExpanded = false },
+                                    volume = playerVolume,
+                                    onVolumeChange = { setVolume(it) }
                                 )
                             }
 
@@ -241,44 +243,6 @@ class MainActivity : ComponentActivity() {
                                                         checkedTrackColor = PrimaryGold.copy(alpha = 0.5f)
                                                     )
                                                 )
-                                            }
-
-                                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-
-                                            // Volume Slider
-                                            Column(modifier = Modifier.fillMaxWidth()) {
-                                                Text(text = "Denggeg (Volume)", color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyLarge)
-                                                Spacer(modifier = Modifier.height(4.dp))
-                                                Row(
-                                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Icon(
-                                                        imageVector = if (playerVolume == 0f) Icons.Default.VolumeMute else Icons.Default.VolumeDown,
-                                                        contentDescription = "Volume Down",
-                                                        tint = TextSecondary,
-                                                        modifier = Modifier.size(24.dp)
-                                                    )
-                                                    Slider(
-                                                        value = playerVolume,
-                                                        onValueChange = { setVolume(it) },
-                                                        valueRange = 0f..1f,
-                                                        colors = SliderDefaults.colors(
-                                                            activeTrackColor = PrimaryGold,
-                                                            inactiveTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                                                            thumbColor = PrimaryGold
-                                                        ),
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .padding(horizontal = 8.dp)
-                                                    )
-                                                    Icon(
-                                                        imageVector = Icons.Default.VolumeUp,
-                                                        contentDescription = "Volume Up",
-                                                        tint = TextSecondary,
-                                                        modifier = Modifier.size(24.dp)
-                                                    )
-                                                }
                                             }
 
                                             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))

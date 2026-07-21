@@ -63,9 +63,13 @@ fun NowPlayingScreen(
     onShuffleToggle: () -> Unit,
     onRepeatToggle: () -> Unit,
     onAddSongToPlaylist: (Long, Song) -> Unit,
-    onCollapse: () -> Unit
+    onCollapse: () -> Unit,
+    volume: Float,
+    onVolumeChange: (Float) -> Unit
 ) {
     var showAddToPlaylistDialog by remember { mutableStateOf(false) }
+    var showMenuDialog by remember { mutableStateOf(false) }
+    var showVolumeDialog by remember { mutableStateOf(false) }
     var albumArt by remember(song) { mutableStateOf<Bitmap?>(null) }
 
     LaunchedEffect(song) {
@@ -139,10 +143,10 @@ fun NowPlayingScreen(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            IconButton(onClick = { showAddToPlaylistDialog = true }) {
+            IconButton(onClick = { showMenuDialog = true }) {
                 Icon(
-                    imageVector = Icons.Default.PlaylistAdd,
-                    contentDescription = stringResource(id = R.string.add_to_playlist),
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
                     tint = TextSecondary
                 )
             }
@@ -407,6 +411,138 @@ fun NowPlayingScreen(
             confirmButton = {
                 TextButton(onClick = { showAddToPlaylistDialog = false }) {
                     Text(text = stringResource(id = R.string.cancel), color = TextSecondary)
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
+    // Menu Options Dialog (Volume or Add to Playlist)
+    if (showMenuDialog) {
+        AlertDialog(
+            onDismissRequest = { showMenuDialog = false },
+            title = {
+                Text(
+                    text = "Pilien ti Aramiden (Select Action)",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = PrimaryGold
+                )
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                ) {
+                    // Option 1: Adjust Volume
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showMenuDialog = false
+                                showVolumeDialog = true
+                            }
+                            .padding(vertical = 12.dp, horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.VolumeUp,
+                            contentDescription = null,
+                            tint = PrimaryGold,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = "Denggeg (Adjust Volume)",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+
+                    // Option 2: Add to Playlist
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showMenuDialog = false
+                                showAddToPlaylistDialog = true
+                            }
+                            .padding(vertical = 12.dp, horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlaylistAdd,
+                            contentDescription = null,
+                            tint = PrimaryGold,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = stringResource(id = R.string.add_to_playlist),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showMenuDialog = false }) {
+                    Text(text = stringResource(id = R.string.cancel), color = TextSecondary)
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
+    // Volume Dialog Modal
+    if (showVolumeDialog) {
+        AlertDialog(
+            onDismissRequest = { showVolumeDialog = false },
+            title = {
+                Text(
+                    text = "Denggeg (Volume)",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = PrimaryGold
+                )
+            },
+            text = {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = if (volume == 0f) Icons.Default.VolumeMute else Icons.Default.VolumeDown,
+                        contentDescription = "Volume Down",
+                        tint = TextSecondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Slider(
+                        value = volume,
+                        onValueChange = onVolumeChange,
+                        valueRange = 0f..1f,
+                        colors = SliderDefaults.colors(
+                            activeTrackColor = PrimaryGold,
+                            inactiveTrackColor = DividerColor(MaterialTheme.colorScheme),
+                            thumbColor = PrimaryGold
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.VolumeUp,
+                        contentDescription = "Volume Up",
+                        tint = TextSecondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showVolumeDialog = false }) {
+                    Text(text = "Nalpas (Done)", color = PrimaryGold, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface,
