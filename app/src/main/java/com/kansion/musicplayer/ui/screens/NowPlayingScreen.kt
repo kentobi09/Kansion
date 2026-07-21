@@ -67,6 +67,7 @@ fun NowPlayingScreen(
     onVolumeChange: (Float) -> Unit
 ) {
     var showAddToPlaylistDialog by remember { mutableStateOf(false) }
+    var showVolumeDialog by remember { mutableStateOf(false) }
     var albumArt by remember(song) { mutableStateOf<Bitmap?>(null) }
 
     LaunchedEffect(song) {
@@ -122,7 +123,10 @@ fun NowPlayingScreen(
                     modifier = Modifier.size(32.dp)
                 )
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = stringResource(id = R.string.now_playing).uppercase(Locale.getDefault()),
                     style = MaterialTheme.typography.labelSmall.copy(
@@ -140,12 +144,22 @@ fun NowPlayingScreen(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            IconButton(onClick = { showAddToPlaylistDialog = true }) {
-                Icon(
-                    imageVector = Icons.Default.PlaylistAdd,
-                    contentDescription = stringResource(id = R.string.add_to_playlist),
-                    tint = TextSecondary
-                )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { showVolumeDialog = true }) {
+                    Icon(
+                        imageVector = if (volume == 0f) Icons.Default.VolumeMute else Icons.Default.VolumeUp,
+                        contentDescription = "Volume",
+                        tint = TextSecondary
+                    )
+                }
+                IconButton(onClick = { showAddToPlaylistDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Default.PlaylistAdd,
+                        contentDescription = stringResource(id = R.string.add_to_playlist),
+                        tint = TextSecondary
+                    )
+                }
             }
         }
 
@@ -365,43 +379,6 @@ fun NowPlayingScreen(
                 )
             }
         }
-        
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Volume Slider Row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = if (volume == 0f) Icons.Default.VolumeMute else Icons.Default.VolumeDown,
-                contentDescription = "Volume Down",
-                tint = TextSecondary,
-                modifier = Modifier.size(24.dp)
-            )
-            Slider(
-                value = volume,
-                onValueChange = onVolumeChange,
-                valueRange = 0f..1f,
-                colors = SliderDefaults.colors(
-                    activeTrackColor = PrimaryGold,
-                    inactiveTrackColor = DividerColor(MaterialTheme.colorScheme),
-                    thumbColor = PrimaryGold
-                ),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp)
-            )
-            Icon(
-                imageVector = Icons.Default.VolumeUp,
-                contentDescription = "Volume Up",
-                tint = TextSecondary,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-
         Spacer(modifier = Modifier.height(24.dp))
     }
 
@@ -444,6 +421,59 @@ fun NowPlayingScreen(
             confirmButton = {
                 TextButton(onClick = { showAddToPlaylistDialog = false }) {
                     Text(text = stringResource(id = R.string.cancel), color = TextSecondary)
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
+    // Volume Dialog Modal
+    if (showVolumeDialog) {
+        AlertDialog(
+            onDismissRequest = { showVolumeDialog = false },
+            title = {
+                Text(
+                    text = "Denggeg (Volume)",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = PrimaryGold
+                )
+            },
+            text = {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = if (volume == 0f) Icons.Default.VolumeMute else Icons.Default.VolumeDown,
+                        contentDescription = "Volume Down",
+                        tint = TextSecondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Slider(
+                        value = volume,
+                        onValueChange = onVolumeChange,
+                        valueRange = 0f..1f,
+                        colors = SliderDefaults.colors(
+                            activeTrackColor = PrimaryGold,
+                            inactiveTrackColor = DividerColor(MaterialTheme.colorScheme),
+                            thumbColor = PrimaryGold
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.VolumeUp,
+                        contentDescription = "Volume Up",
+                        tint = TextSecondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showVolumeDialog = false }) {
+                    Text(text = "Nalpas (Done)", color = PrimaryGold, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface,
