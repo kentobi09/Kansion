@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.media3.common.Player
 import com.kansion.musicplayer.Playlist
 import com.kansion.musicplayer.R
@@ -153,7 +154,8 @@ fun NowPlayingScreen(
         Box(
             modifier = Modifier
                 .size(280.dp)
-                .rotate(animatedRotation),
+                .rotate(animatedRotation)
+                .pointerInput(Unit) {},
             contentAlignment = Alignment.Center
         ) {
             // Draw Vinyl Grooves

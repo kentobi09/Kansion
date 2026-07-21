@@ -34,6 +34,8 @@ import com.kansion.musicplayer.ui.screens.PermissionScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -213,7 +215,9 @@ class MainActivity : ComponentActivity() {
                                     text = {
                                         Column(
                                             verticalArrangement = Arrangement.spacedBy(16.dp),
-                                            modifier = Modifier.fillMaxWidth()
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .verticalScroll(rememberScrollState())
                                         ) {
                                             // Dark Mode Toggle
                                             Row(
@@ -613,14 +617,27 @@ class MainActivity : ComponentActivity() {
         } else {
             listOf(song)
         }
-        val startIndex = songList.indexOf(song).coerceAtLeast(0)
+        val startIndexInList = songList.indexOf(song).coerceAtLeast(0)
+        val limitedList = if (songList.size > 10) {
+            val end = (startIndexInList + 10).coerceAtMost(songList.size)
+            val subList = songList.subList(startIndexInList, end).toMutableList()
+            if (subList.size < 10 && songList.size >= 10) {
+                val remaining = 10 - subList.size
+                val prefix = songList.subList(0, remaining)
+                subList.addAll(prefix)
+            }
+            subList
+        } else {
+            songList
+        }
+        val startIndex = limitedList.indexOf(song).coerceAtLeast(0)
         
         isPlayingFromQueue = false
-        queue = songList
+        queue = limitedList
         repository.saveQueue(queue)
         
         controller.clearMediaItems()
-        val mediaItems = songList.map {
+        val mediaItems = limitedList.map {
             MediaItem.Builder()
                 .setMediaId(it.id.toString())
                 .setUri(it.uri)
