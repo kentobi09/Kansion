@@ -62,7 +62,9 @@ fun NowPlayingScreen(
     onShuffleToggle: () -> Unit,
     onRepeatToggle: () -> Unit,
     onAddSongToPlaylist: (Long, Song) -> Unit,
-    onCollapse: () -> Unit
+    onCollapse: () -> Unit,
+    volume: Float,
+    onVolumeChange: (Float) -> Unit
 ) {
     var showAddToPlaylistDialog by remember { mutableStateOf(false) }
     var albumArt by remember(song) { mutableStateOf<Bitmap?>(null) }
@@ -364,6 +366,42 @@ fun NowPlayingScreen(
             }
         }
         
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Volume Slider Row
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = if (volume == 0f) Icons.Default.VolumeMute else Icons.Default.VolumeDown,
+                contentDescription = "Volume Down",
+                tint = TextSecondary,
+                modifier = Modifier.size(24.dp)
+            )
+            Slider(
+                value = volume,
+                onValueChange = onVolumeChange,
+                valueRange = 0f..1f,
+                colors = SliderDefaults.colors(
+                    activeTrackColor = PrimaryGold,
+                    inactiveTrackColor = DividerColor(MaterialTheme.colorScheme),
+                    thumbColor = PrimaryGold
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp)
+            )
+            Icon(
+                imageVector = Icons.Default.VolumeUp,
+                contentDescription = "Volume Up",
+                tint = TextSecondary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
     }
 

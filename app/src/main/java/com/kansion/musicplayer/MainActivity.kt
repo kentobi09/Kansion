@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
     private var isShuffleState by mutableStateOf(false)
     private var repeatModeState by mutableIntStateOf(Player.REPEAT_MODE_OFF)
     private var isPlayingFromQueue = false
+    private var playerVolume by mutableFloatStateOf(1f)
     
     // Detailed playlist view states
     private var activePlaylist by mutableStateOf<Playlist?>(null)
@@ -192,7 +193,9 @@ class MainActivity : ComponentActivity() {
                                     onShuffleToggle = { toggleShuffle() },
                                     onRepeatToggle = { toggleRepeat() },
                                     onAddSongToPlaylist = { playlistId, song -> addSongToPlaylist(playlistId, song) },
-                                    onCollapse = { isPlayerExpanded = false }
+                                    onCollapse = { isPlayerExpanded = false },
+                                    volume = playerVolume,
+                                    onVolumeChange = { setVolume(it) }
                                 )
                             }
 
@@ -515,6 +518,7 @@ class MainActivity : ComponentActivity() {
         isPlayingState = controller.playWhenReady && controller.playbackState == Player.STATE_READY
         isShuffleState = controller.shuffleModeEnabled
         repeatModeState = controller.repeatMode
+        playerVolume = controller.volume
 
         currentSongIndex = controller.currentMediaItemIndex
         songDuration = controller.duration.coerceAtLeast(0L)
@@ -683,6 +687,12 @@ class MainActivity : ComponentActivity() {
     private fun seekTo(position: Long) {
         mediaController?.seekTo(position)
         playbackProgress = position
+    }
+
+    private fun setVolume(volume: Float) {
+        val controller = mediaController ?: return
+        controller.volume = volume
+        playerVolume = volume
     }
 
     private fun toggleShuffle() {
