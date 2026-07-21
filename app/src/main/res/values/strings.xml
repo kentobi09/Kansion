@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kansion</string>
+    <string name="title_songs">Kankansion</string>
+    <string name="title_playlists">Listaan</string>
+    <string name="title_queue">Ur-uray</string>
+    
+    <!-- Player Controls & State -->
+    <string name="play">Patugtugen</string>
+    <string name="pause">Pasardengen</string>
+    <string name="next">Sumaruno</string>
+    <string name="previous">Immuna</string>
+    <string name="now_playing">Agpatpatugtog ita</string>
+    <string name="shuffle">Laoken</string>
+    <string name="repeat">Uliten</string>
+    
+    <!-- Dialogs & Actions -->
+    <string name="add_to_playlist">Inayon iti listaan</string>
+    <string name="remove_from_playlist">Ikkaton iti listaan</string>
+    <string name="delete_playlist">Pukawen ti listaan</string>
+    <string name="create_playlist">Mangaramid iti Listaan</string>
+    <string name="playlist_name">Nagan ti Listaan</string>
+    <string name="cancel">Ibaba</string>
+    <string name="create">Aramiden</string>
+    <string name="sort_by">Urnosen babaen ti</string>
+    <string name="sort_title">Titulo</string>
+    <string name="sort_artist">Nagkansion (Artista)</string>
+    <string name="sort_date">Petsa ti Pannakainayon</string>
+    
+    <!-- Status / Info -->
+    <string name="no_songs_found">Awan ti kanta a nasarakan.</string>
+    <string name="search_hint">Biruken...</string>
+    <string name="unknown_artist">Di am-ammo nga Agkankansion</string>
+    <string name="unknown_album">Di am-ammo nga album</string>
+    
+    <!-- Permissions Screen -->
+    <string name="permission_required_title">Masapul ti Permiso</string>
+    <string name="permission_required_desc">Tapno mapatugtog dagiti kanta ti selponyo, masapul ti permiso ti Kansion a mangkita kadagiti audio file-yo. Palubosan ti app tapno makalugod.</string>
+    <string name="grant_permission">Palubosan</string>
+</resources>
