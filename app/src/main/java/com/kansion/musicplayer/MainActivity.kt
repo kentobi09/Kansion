@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
 
     // UI Expansion State
     private var isPlayerExpanded by mutableStateOf(false)
+    private var isSettingsClickAllowed by mutableStateOf(true)
     private var playbackProgress by mutableLongStateOf(0L)
     private var songDuration by mutableLongStateOf(0L)
 
@@ -160,11 +161,18 @@ class MainActivity : ComponentActivity() {
                                 onAddSongToPlaylist = { playlistId, song -> addSongToPlaylist(playlistId, song) },
                                 onAddSongToQueue = { song -> addSongToQueue(song) },
                                 onPlayPauseToggle = { togglePlayPause() },
-                                onExpandPlayer = { isPlayerExpanded = true },
+                                onExpandPlayer = { 
+                                     isPlayerExpanded = true
+                                     isSettingsClickAllowed = false
+                                 },
                                 onQueueMove = { from, to -> moveQueueItem(from, to) },
                                 onNext = { playNext() },
                                 onPrevious = { playPrevious() },
-                                onSettingsClick = { showSettingsDialog = true }
+                                onSettingsClick = { 
+                                     if (isSettingsClickAllowed) {
+                                         showSettingsDialog = true 
+                                     }
+                                 }
                             )
 
                             AnimatedVisibility(
@@ -198,7 +206,13 @@ class MainActivity : ComponentActivity() {
                                     onShuffleToggle = { toggleShuffle() },
                                     onRepeatToggle = { toggleRepeat() },
                                     onAddSongToPlaylist = { playlistId, song -> addSongToPlaylist(playlistId, song) },
-                                    onCollapse = { isPlayerExpanded = false },
+                                    onCollapse = {
+                                        isPlayerExpanded = false
+                                        lifecycleScope.launch {
+                                            delay(400)
+                                            isSettingsClickAllowed = true
+                                        }
+                                    },
                                     volume = playerVolume,
                                     onVolumeChange = { setVolume(it) }
                                 )
