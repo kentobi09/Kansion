@@ -187,15 +187,17 @@ fun MainScreen(
                                     onBackToPlaylists()
                                 }
                             },
-                            text = {
-                                Text(
-                                    text = title,
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Medium
-                                    ),
-                                    color = if (selectedTab == index) PrimaryGold else TextSecondary
-                                )
-                            }
+                             text = {
+                                 Text(
+                                     text = title,
+                                     maxLines = 1,
+                                     overflow = TextOverflow.Ellipsis,
+                                     style = MaterialTheme.typography.bodyMedium.copy(
+                                         fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Medium
+                                     ),
+                                     color = if (selectedTab == index) PrimaryGold else TextSecondary
+                                 )
+                             }
                         )
                     }
                 }

@@ -20,10 +20,23 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file("kansion.jks")
+            storePassword "kansion123"
+            keyAlias "kansion"
+            keyPassword "kansion123"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
