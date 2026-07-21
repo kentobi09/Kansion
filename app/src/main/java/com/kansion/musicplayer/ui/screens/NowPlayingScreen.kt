@@ -145,7 +145,7 @@ fun NowPlayingScreen(
             }
             IconButton(onClick = { showMenuDialog = true }) {
                 Icon(
-                    imageVector = Icons.Default.Menu,
+                    imageVector = Icons.Default.MoreVert,
                     contentDescription = "Menu",
                     tint = TextSecondary
                 )
