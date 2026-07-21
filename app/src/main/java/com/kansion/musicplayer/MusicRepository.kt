@@ -122,6 +122,14 @@ class MusicRepository(private val context: Context) {
         return songIds.mapNotNull { songsMap[it] }
     }
 
+    suspend fun getLyrics(songId: Long): String? = withContext(Dispatchers.IO) {
+        return@withContext dbHelper.getLyrics(songId)
+    }
+
+    suspend fun saveLyrics(songId: Long, lyricsText: String) = withContext(Dispatchers.IO) {
+        dbHelper.saveLyrics(songId, lyricsText)
+    }
+
     suspend fun clearAllData() = withContext(Dispatchers.IO) {
         dbHelper.clearAllData()
     }

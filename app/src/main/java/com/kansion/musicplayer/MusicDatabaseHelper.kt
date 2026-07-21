@@ -9,7 +9,7 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
 
     companion object {
         private const val DATABASE_NAME = "kansion.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
 
         // Playlists Table
         private const val TABLE_PLAYLISTS = "playlists"
@@ -25,6 +25,11 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         private const val TABLE_QUEUE = "queue"
         private const val KEY_QUEUE_SONG_ID = "song_id"
         private const val KEY_QUEUE_ORDER = "queue_order"
+
+        // Lyrics Table
+        private const val TABLE_LYRICS = "lyrics"
+        private const val KEY_LYRICS_SONG_ID = "song_id"
+        private const val KEY_LYRICS_TEXT = "lyrics_text"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -42,16 +47,23 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
                 + KEY_QUEUE_SONG_ID + " INTEGER PRIMARY KEY,"
                 + KEY_QUEUE_ORDER + " INTEGER" + ")")
 
+        val createLyricsTable = ("CREATE TABLE " + TABLE_LYRICS + "("
+                + KEY_LYRICS_SONG_ID + " INTEGER PRIMARY KEY,"
+                + KEY_LYRICS_TEXT + " TEXT" + ")")
+
         db.execSQL(createPlaylistsTable)
         db.execSQL(createPlaylistSongsTable)
         db.execSQL(createQueueTable)
+        db.execSQL(createLyricsTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_PLAYLIST_SONGS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_PLAYLISTS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_QUEUE")
-        onCreate(db)
+        if (oldVersion < 2) {
+            val createLyricsTable = ("CREATE TABLE " + TABLE_LYRICS + "("
+                    + KEY_LYRICS_SONG_ID + " INTEGER PRIMARY KEY,"
+                    + KEY_LYRICS_TEXT + " TEXT" + ")")
+            db.execSQL(createLyricsTable)
+        }
     }
 
     override fun onConfigure(db: SQLiteDatabase) {
@@ -190,6 +202,37 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         db.delete(TABLE_PLAYLIST_SONGS, null, null)
         db.delete(TABLE_PLAYLISTS, null, null)
         db.delete(TABLE_QUEUE, null, null)
+        db.delete(TABLE_LYRICS, null, null)
         db.close()
+    }
+
+    // Lyrics Operations
+    fun saveLyrics(songId: Long, lyricsText: String) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(KEY_LYRICS_SONG_ID, songId)
+            put(KEY_LYRICS_TEXT, lyricsText)
+        }
+        db.insertWithOnConflict(TABLE_LYRICS, null, values, SQLiteDatabase.CONFLICT_REPLACE)
+    }
+
+    fun getLyrics(songId: Long): String? {
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_LYRICS,
+            arrayOf(KEY_LYRICS_TEXT),
+            "$KEY_LYRICS_SONG_ID = ?",
+            arrayOf(songId.toString()),
+            null, null, null
+        )
+        var lyrics: String? = null
+        if (cursor.moveToFirst()) {
+            val index = cursor.getColumnIndex(KEY_LYRICS_TEXT)
+            if (index != -1) {
+                lyrics = cursor.getString(index)
+            }
+        }
+        cursor.close()
+        return lyrics
     }
 }

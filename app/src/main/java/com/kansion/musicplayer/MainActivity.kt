@@ -215,7 +215,10 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                     volume = playerVolume,
-                                    onVolumeChange = { setVolume(it) }
+                                    onVolumeChange = { setVolume(it) },
+                                    onLoadLyrics = { songId -> repository.getLyrics(songId) },
+                                    onSaveLyrics = { songId, text -> repository.saveLyrics(songId, text) },
+                                    onSearchLyricsOnline = { title, artist -> LyricsSearchService.searchLyrics(title, artist) }
                                 )
                             }
 

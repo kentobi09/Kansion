@@ -13,6 +13,9 @@
     
     <!-- Wake lock to prevent CPU sleep during play -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
+    <!-- Internet access for lyrics search -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"

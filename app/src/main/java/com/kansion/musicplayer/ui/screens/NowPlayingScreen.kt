@@ -45,6 +45,12 @@ import com.kansion.musicplayer.ui.theme.TextSecondary
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import android.widget.Toast
+import kotlinx.coroutines.launch
+import com.kansion.musicplayer.LyricsSearchService
 
 @Composable
 fun NowPlayingScreen(
@@ -65,12 +71,28 @@ fun NowPlayingScreen(
     onAddSongToPlaylist: (Long, Song) -> Unit,
     onCollapse: () -> Unit,
     volume: Float,
-    onVolumeChange: (Float) -> Unit
+    onVolumeChange: (Float) -> Unit,
+    onLoadLyrics: suspend (Long) -> String?,
+    onSaveLyrics: suspend (Long, String) -> Unit,
+    onSearchLyricsOnline: suspend (String, String) -> String?
 ) {
     var showAddToPlaylistDialog by remember { mutableStateOf(false) }
     var showMenuDialog by remember { mutableStateOf(false) }
     var showVolumeDialog by remember { mutableStateOf(false) }
     var albumArt by remember(song) { mutableStateOf<Bitmap?>(null) }
+
+    var showLyrics by remember { mutableStateOf(false) }
+    var showPasteDialog by remember { mutableStateOf(false) }
+    var lyricsText by remember(song) { mutableStateOf<String?>(null) }
+    var isLoadingLyrics by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    LaunchedEffect(song) {
+        isLoadingLyrics = true
+        lyricsText = onLoadLyrics(song.id)
+        isLoadingLyrics = false
+    }
 
     LaunchedEffect(song) {
         withContext(Dispatchers.IO) {
@@ -154,84 +176,210 @@ fun NowPlayingScreen(
 
         Spacer(modifier = Modifier.weight(0.5f))
 
-        // Vinyl Record Disk Representation
-        Box(
-            modifier = Modifier
-                .size(280.dp)
-                .rotate(animatedRotation)
-                .pointerInput(Unit) {},
-            contentAlignment = Alignment.Center
-        ) {
-            // Draw Vinyl Grooves
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val center = Offset(size.width / 2, size.height / 2)
-                val outerRadius = size.width / 2
-                
-                // Base black plate
-                drawCircle(
-                    color = Color(0xFF1E1E1E),
-                    radius = outerRadius
-                )
-                
-                // Outer gold highlight ring
-                drawCircle(
-                    color = PrimaryGold,
-                    radius = outerRadius - 2f,
-                    style = Stroke(width = 2f)
-                )
-                
-                // Groove lines
-                for (r in (outerRadius.toInt() - 20 downTo 60 step 15)) {
+        if (showLyrics) {
+            Box(
+                modifier = Modifier
+                    .size(280.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+                    .padding(12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isLoadingLyrics) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(color = PrimaryGold)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Birobiroken ti liriko...",
+                            color = TextSecondary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                } else if (!lyricsText.isNullOrBlank()) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 28.dp, bottom = 8.dp)
+                                .verticalScroll(rememberScrollState()),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = lyricsText!!,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    lineHeight = 24.sp,
+                                    fontWeight = FontWeight.Medium
+                                ),
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            )
+                        }
+
+                        // Close button overlay
+                        IconButton(
+                            onClick = { showLyrics = false },
+                            modifier = Modifier
+                                .size(32.dp)
+                                .align(Alignment.TopEnd)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = TextSecondary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Awan ti nasarakan a liriko.",
+                                color = TextSecondary,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        isLoadingLyrics = true
+                                        val result = onSearchLyricsOnline(song.title, song.artist)
+                                        if (result != null) {
+                                            lyricsText = result
+                                            onSaveLyrics(song.id, result)
+                                            Toast.makeText(context, "Nasarakan ti liriko!", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            Toast.makeText(context, "Awan ti nasarakan online", Toast.LENGTH_SHORT).show()
+                                        }
+                                        isLoadingLyrics = false
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryGold),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth().height(40.dp)
+                            ) {
+                                Text("Biroken Online", color = Color.Black, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedButton(
+                                onClick = { showPasteDialog = true },
+                                border = BorderStroke(1.dp, PrimaryGold),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryGold),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth().height(40.dp)
+                            ) {
+                                Text("I-paste ti Liriko", fontWeight = FontWeight.Bold)
+                            }
+                        }
+
+                        // Close button overlay
+                        IconButton(
+                            onClick = { showLyrics = false },
+                            modifier = Modifier
+                                .size(32.dp)
+                                .align(Alignment.TopEnd)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = TextSecondary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            // Vinyl Record Disk Representation
+            Box(
+                modifier = Modifier
+                    .size(280.dp)
+                    .rotate(animatedRotation)
+                    .pointerInput(Unit) {},
+                contentAlignment = Alignment.Center
+            ) {
+                // Draw Vinyl Grooves
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val center = Offset(size.width / 2, size.height / 2)
+                    val outerRadius = size.width / 2
+                    
+                    // Base black plate
                     drawCircle(
-                        color = Color.Black.copy(alpha = 0.4f),
-                        radius = r.toFloat(),
-                        style = Stroke(width = 1f)
+                        color = Color(0xFF1E1E1E),
+                        radius = outerRadius
+                    )
+                    
+                    // Outer gold highlight ring
+                    drawCircle(
+                        color = PrimaryGold,
+                        radius = outerRadius - 2f,
+                        style = Stroke(width = 2f)
+                    )
+                    
+                    // Groove lines
+                    for (r in (outerRadius.toInt() - 20 downTo 60 step 15)) {
+                        drawCircle(
+                            color = Color.Black.copy(alpha = 0.4f),
+                            radius = r.toFloat(),
+                            style = Stroke(width = 1f)
+                        )
+                    }
+                    
+                    // Center Label
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(AccentGold, PrimaryGold)
+                        ),
+                        radius = 55f
+                    )
+                    
+                    // Center pin hole
+                    drawCircle(
+                        color = Color(0xFF121110),
+                        radius = 12f
                     )
                 }
                 
-                // Center Label
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(AccentGold, PrimaryGold)
-                    ),
-                    radius = 55f
-                )
-                
-                // Center pin hole
-                drawCircle(
-                    color = Color(0xFF121110),
-                    radius = 12f
-                )
-            }
-            
-            if (albumArt != null) {
-                Image(
-                    bitmap = albumArt!!.asImageBitmap(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(90.dp)
-                        .clip(CircleShape)
-                )
-                // pinhole
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.background)
-                )
-            } else {
-                // Custom text on CD label
-                Text(
-                    text = "kansion".uppercase(),
-                    color = Color.Black.copy(alpha = 0.5f),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
-                        letterSpacing = 1.sp
-                    ),
-                    modifier = Modifier.padding(bottom = 50.dp)
-                )
+                if (albumArt != null) {
+                    Image(
+                        bitmap = albumArt!!.asImageBitmap(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(90.dp)
+                            .clip(CircleShape)
+                    )
+                    // pinhole
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.background)
+                    )
+                } else {
+                    // Custom text on CD label
+                    Text(
+                        text = "kansion".uppercase(),
+                        color = Color.Black.copy(alpha = 0.5f),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp,
+                            letterSpacing = 1.sp
+                        ),
+                        modifier = Modifier.padding(bottom = 50.dp)
+                    )
+                }
             }
         }
 
@@ -485,6 +633,33 @@ fun NowPlayingScreen(
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
+
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+
+                    // Option 3: Lyrics
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showMenuDialog = false
+                                showLyrics = true
+                            }
+                            .padding(vertical = 12.dp, horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Description,
+                            contentDescription = null,
+                            tint = PrimaryGold,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = "Liriko (Lyrics)",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             },
             confirmButton = {
@@ -543,6 +718,57 @@ fun NowPlayingScreen(
             confirmButton = {
                 TextButton(onClick = { showVolumeDialog = false }) {
                     Text(text = "Nalpas (Done)", color = PrimaryGold, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+        )
+    }
+
+    // Paste Lyrics Dialog Modal
+    if (showPasteDialog) {
+        var pastedText by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showPasteDialog = false },
+            title = {
+                Text(
+                    text = "I-paste ti Liriko",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = PrimaryGold
+                )
+            },
+            text = {
+                OutlinedTextField(
+                    value = pastedText,
+                    onValueChange = { pastedText = it },
+                    label = { Text("Liriko (Lyrics)") },
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryGold,
+                        unfocusedBorderColor = TextSecondary.copy(alpha = 0.5f),
+                        focusedLabelColor = PrimaryGold,
+                        cursorColor = PrimaryGold
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (pastedText.isNotBlank()) {
+                            lyricsText = pastedText
+                            scope.launch {
+                                onSaveLyrics(song.id, pastedText)
+                            }
+                            Toast.makeText(context, "Liriko ket naisave!", Toast.LENGTH_SHORT).show()
+                        }
+                        showPasteDialog = false
+                    }
+                ) {
+                    Text(text = "I-save", color = PrimaryGold, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPasteDialog = false }) {
+                    Text(text = "I-kansela", color = TextSecondary)
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface,
