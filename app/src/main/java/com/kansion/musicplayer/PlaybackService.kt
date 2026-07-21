@@ -25,7 +25,7 @@ class PlaybackService : MediaSessionService() {
                     .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
                     .setUsage(C.USAGE_MEDIA)
                     .build(),
-                true // Handles audio focus automatically
+                false // Handles audio focus automatically
             )
             .setHandleAudioBecomingNoisy(true) // Pauses automatically when headphones are unplugged
             .setWakeMode(C.WAKE_MODE_LOCAL) // Keeps CPU awake during playback
