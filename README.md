@@ -7,16 +7,8 @@
 ## 📱 Features
 
 * **Dialect Localization**: Native Ilokano phrasing across the interface (e.g., *Kankansion* for Songs, *Listaan* for Playlists, *Ur-uray* for Queue, *Pinagpaut* for Duration, *Denggeg* for Volume).
-* **Tactile Vinyl Disk Representation**: Smoothly rotating record visual representation that animates in sync with playback.
-* **Kebab Options Menu**: A vertical three-dot option menu inside the playback screen header grouping volume controls (*Denggeg*) and playlist additions (*Inayon iti listaan*), keeping the interface clean and symmetrical.
-* **10-Song Playback Queue Cap**: Automatically loads the clicked song + the next 9 sequential songs when playing from the main list. This keeps your queue compact and prevents interface lag on devices with large libraries.
-* **Settings Dashboard**:
-  * **Rupan Kansion (App Theme)**: Light/Dark mode toggle (saved to preferences to persist across app restarts).
-  * **Oras ti Turog (Sleep Timer)**: Configurable background sleep timer (15m, 30m, 45m, 60m) with a real-time countdown.
-  * **Sukiren manen dagiti kansion (Rescan)**: Instantly rescans local files to update the audio library.
-  * **Pukawen ti Data (Reset Data)**: Localized warning dialog to securely wipe database playlists and queue states.
+* **Oras ti Turog (Sleep Timer)**: Configurable background sleep timer (15m, 30m, 45m, 60m) with a real-time countdown.
 * **Simultaneous Playback**: Disabled automatic audio focus pause constraints. You can play your local music continuously in the background—even during active voice/video calls.
-* **Headphone Unplug Pausing**: Automatically pauses playback when headphones are unplugged to prevent accidental speaker output.
 
 ---
 
