@@ -705,7 +705,7 @@ class MainActivity : ComponentActivity() {
     private fun playNext() {
         val controller = mediaController ?: return
         if (controller.hasNextMediaItem()) {
-            controller.seekToNext()
+            controller.seekToNextMediaItem()
         } else if (controller.mediaItemCount > 0) {
             controller.seekToDefaultPosition(0)
             controller.play()
@@ -715,7 +715,7 @@ class MainActivity : ComponentActivity() {
     private fun playPrevious() {
         val controller = mediaController ?: return
         if (controller.hasPreviousMediaItem()) {
-            controller.seekToPrevious()
+            controller.seekToPreviousMediaItem()
         } else if (controller.mediaItemCount > 0) {
             controller.seekToDefaultPosition(controller.mediaItemCount - 1)
             controller.play()
@@ -737,6 +737,31 @@ class MainActivity : ComponentActivity() {
         val controller = mediaController ?: return
         val targetShuffle = !controller.shuffleModeEnabled
         controller.setShuffleModeEnabled(targetShuffle)
+
+        if (targetShuffle && !isPlayingFromQueue) {
+            val fullList = if (activePlaylist != null) playlistSongs else songs
+            if (controller.mediaItemCount < fullList.size) {
+                val currentMediaItem = controller.currentMediaItem
+                val currentPosition = controller.currentPosition
+                
+                controller.clearMediaItems()
+                val mediaItems = fullList.map {
+                    MediaItem.Builder()
+                        .setMediaId(it.id.toString())
+                        .setUri(it.uri)
+                        .build()
+                }
+                val startIndex = fullList.indexOfFirst { it.id.toString() == currentMediaItem?.mediaId }.coerceAtLeast(0)
+                
+                queue = fullList
+                repository.saveQueue(queue)
+                
+                controller.setMediaItems(mediaItems, startIndex, currentPosition)
+                controller.setShuffleModeEnabled(true)
+                controller.prepare()
+                controller.play()
+            }
+        }
     }
 
     private fun toggleRepeat() {
