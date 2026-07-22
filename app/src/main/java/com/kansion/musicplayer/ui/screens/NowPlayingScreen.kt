@@ -126,13 +126,14 @@ fun NowPlayingScreen(
     
     val animatedRotation = if (isPlaying) rotation else 0f
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
         // Top Bar
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -519,6 +520,214 @@ fun NowPlayingScreen(
         }
         Spacer(modifier = Modifier.height(24.dp))
     }
+
+    // Full Screen Lyrics Overlay (Spotify Style)
+    if (showLyrics) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1E1A15),
+                            Color(0xFF14110E)
+                        )
+                    )
+                )
+                .padding(24.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // Header Row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { showLyrics = false }) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Back",
+                            tint = PrimaryGold,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+                    ) {
+                        Text(
+                            text = song.title,
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = song.artist,
+                            color = TextSecondary,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    
+                    IconButton(onClick = { showLyrics = false }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = TextSecondary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Middle content
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isLoadingLyrics) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(color = PrimaryGold)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Birobiroken ti liriko...",
+                                color = TextSecondary,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    } else if (!lyricsText.isNullOrBlank()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(vertical = 12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = lyricsText!!,
+                                color = Color.White,
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    lineHeight = 36.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp
+                                ),
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            )
+                        }
+                    } else {
+                        // Empty lyrics view
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Description,
+                                contentDescription = null,
+                                tint = TextSecondary.copy(alpha = 0.5f),
+                                modifier = Modifier.size(64.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Awan ti nasarakan a liriko.",
+                                color = TextSecondary,
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        isLoadingLyrics = true
+                                        val result = onSearchLyricsOnline(song.title, song.artist)
+                                        if (result != null) {
+                                            lyricsText = result
+                                            onSaveLyrics(song.id, result)
+                                            Toast.makeText(context, "Nasarakan ti liriko!", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            Toast.makeText(context, "Awan ti nasarakan online", Toast.LENGTH_SHORT).show()
+                                        }
+                                        isLoadingLyrics = false
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryGold),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                            ) {
+                                Text("Biroken Online", color = Color.Black, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            OutlinedButton(
+                                onClick = { showPasteDialog = true },
+                                border = BorderStroke(1.dp, PrimaryGold),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryGold),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth().height(48.dp)
+                            ) {
+                                Text("I-paste ti Liriko", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Bottom controls row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onPrevious) {
+                        Icon(
+                            imageVector = Icons.Default.SkipPrevious,
+                            contentDescription = "Previous",
+                            tint = Color.White,
+                            modifier = Modifier.size(36.dp)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onPlayPauseToggle,
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(PrimaryGold)
+                    ) {
+                        Icon(
+                            imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            contentDescription = "Play/Pause",
+                            tint = Color.Black,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+
+                    IconButton(onClick = onNext) {
+                        Icon(
+                            imageVector = Icons.Default.SkipNext,
+                            contentDescription = "Next",
+                            tint = Color.White,
+                            modifier = Modifier.size(36.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 
     // Add to Playlist Dialog
     if (showAddToPlaylistDialog) {
