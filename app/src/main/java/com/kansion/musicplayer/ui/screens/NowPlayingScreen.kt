@@ -572,6 +572,16 @@ fun NowPlayingScreen(
                         )
                     }
                     
+                    if (!lyricsText.isNullOrBlank()) {
+                        IconButton(onClick = { showPasteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit Lyrics",
+                                tint = PrimaryGold
+                            )
+                        }
+                    }
+                    
                     IconButton(onClick = { showLyrics = false }) {
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -935,7 +945,7 @@ fun NowPlayingScreen(
 
     // Paste Lyrics Dialog Modal
     if (showPasteDialog) {
-        var pastedText by remember { mutableStateOf("") }
+        var pastedText by remember(lyricsText) { mutableStateOf(lyricsText ?: "") }
         AlertDialog(
             onDismissRequest = { showPasteDialog = false },
             title = {
