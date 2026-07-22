@@ -8,7 +8,15 @@
 
 * **Dialect Localization**: Native Ilokano phrasing across the interface (e.g., *Kankansion* for Songs, *Listaan* for Playlists, *Ur-uray* for Queue, *Pinagpaut* for Duration, *Denggeg* for Volume).
 * **Tactile Vinyl Disk Representation**: Smoothly rotating record visual representation that animates in sync with playback.
-* **Kebab Options Menu**: A vertical three-dot option menu inside the playback screen header grouping volume controls (*Denggeg*) and playlist additions (*Inayon iti listaan*), keeping the interface clean and symmetrical.
+* **Full-Screen Spotify-Style Lyrics**: 
+  * Access lyrics via the playback kebab menu (**`Liriko`**).
+  * Opens a beautiful full-screen scrollable lyrics sheet with large bold typography and a vertical gradient theme.
+  * Pinned bottom playback controls (Previous, Play/Pause, Next) let you control music without exiting the lyrics view.
+* **Lyrics Search, Caching & Editing**:
+  * **Online Search**: Queries the free, public *LRCLIB* database and caches matches locally in SQLite (v2 database upgrade).
+  * **Manual Editing & Pasting**: Allows you to paste new lyrics or correct existing cached lyrics in-app using a pre-filled text editor.
+  * **Smart Query Sanitization**: Cleans underscores, strips extensions (`.mp3`), and removes clutter tags (like `[Lyrics]` or `(Official Video)`). Auto-splits combined filenames (like `Artist - Title` or `Title by Artist`) when tags are missing, maximizing lyrics match accuracy.
+* **Kebab Options Menu**: A vertical three-dot option menu inside the playback screen header grouping volume controls (*Denggeg*), playlist additions (*Inayon iti listaan*), and lyrics display (*Liriko*), keeping the interface clean and symmetrical.
 * **10-Song Playback Queue Cap**: Automatically loads the clicked song + the next 9 sequential songs when playing from the main list. This keeps your queue compact and prevents interface lag on devices with large libraries.
 * **Settings Dashboard**:
   * **Rupan Kansion (App Theme)**: Light/Dark mode toggle (saved to preferences to persist across app restarts).
