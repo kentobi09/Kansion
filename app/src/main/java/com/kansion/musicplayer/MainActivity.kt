@@ -519,7 +519,7 @@ class MainActivity : ComponentActivity() {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             val controller = mediaController ?: return
             val currentIndex = controller.currentMediaItemIndex
-            if (isPlayingFromQueue && currentIndex > 0) {
+            if (isPlayingFromQueue && currentIndex > 0 && !controller.shuffleModeEnabled) {
                 for (i in 0 until currentIndex) {
                     controller.removeMediaItem(0)
                 }
@@ -600,7 +600,7 @@ class MainActivity : ComponentActivity() {
             listOf(song)
         }
         val startIndexInList = songList.indexOf(song).coerceAtLeast(0)
-        val limitedList = if (songList.size > 10) {
+        val limitedList = if (songList.size > 10 && !isShuffleState) {
             val end = (startIndexInList + 10).coerceAtMost(songList.size)
             val subList = songList.subList(startIndexInList, end).toMutableList()
             if (subList.size < 10 && songList.size >= 10) {

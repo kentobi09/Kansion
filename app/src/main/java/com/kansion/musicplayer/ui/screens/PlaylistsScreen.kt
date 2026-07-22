@@ -55,6 +55,7 @@ fun PlaylistsScreen(
     var newPlaylistName by remember { mutableStateOf("") }
     var showAddSongsDialog by remember { mutableStateOf(false) }
     var playlistToDelete by remember { mutableStateOf<Playlist?>(null) }
+    var batchTextFilter by remember { mutableStateOf("") }
     
     val songsAvailableToAdd = remember(allSongs, playlistSongs) {
         val existingIds = playlistSongs.map { it.id }.toSet()
@@ -65,6 +66,7 @@ fun PlaylistsScreen(
     LaunchedEffect(showAddSongsDialog) {
         if (showAddSongsDialog) {
             selectedSongs.clear()
+            batchTextFilter = ""
         }
     }
 
@@ -260,39 +262,99 @@ fun PlaylistsScreen(
                 )
             },
             text = {
+                val filteredSongsToAdd = remember(songsAvailableToAdd, batchTextFilter) {
+                    if (batchTextFilter.isBlank()) {
+                        songsAvailableToAdd
+                    } else {
+                        songsAvailableToAdd.filter {
+                            it.title.contains(batchTextFilter, ignoreCase = true) ||
+                            it.artist.contains(batchTextFilter, ignoreCase = true)
+                        }
+                    }
+                }
+
                 if (songsAvailableToAdd.isEmpty()) {
                     Text(text = "Awan ti kanta a mabalin nga inayon.", color = TextSecondary)
                 } else {
-                    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
-                        items(songsAvailableToAdd) { song ->
-                            val isSelected = selectedSongs.contains(song)
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        if (isSelected) selectedSongs.remove(song) else selectedSongs.add(song)
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = batchTextFilter,
+                            onValueChange = { batchTextFilter = it },
+                            label = { Text("Filter wenno Batch Add (e.g. opm)", color = TextSecondary) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = PrimaryGold,
+                                unfocusedBorderColor = TextSecondary.copy(alpha = 0.5f),
+                                focusedLabelColor = PrimaryGold,
+                                cursorColor = PrimaryGold
+                            )
+                        )
+
+                        if (batchTextFilter.isNotBlank() && filteredSongsToAdd.isNotEmpty()) {
+                            Button(
+                                onClick = {
+                                    filteredSongsToAdd.forEach { song ->
+                                        if (!selectedSongs.contains(song)) {
+                                            selectedSongs.add(song)
+                                        }
                                     }
-                                    .padding(vertical = 12.dp, horizontal = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = PrimaryGold,
+                                    contentColor = MaterialTheme.colorScheme.background
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth().height(40.dp)
                             ) {
-                                Checkbox(
-                                    checked = isSelected,
-                                    onCheckedChange = { checked ->
-                                        if (checked == true) selectedSongs.add(song) else selectedSongs.remove(song)
-                                    },
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = PrimaryGold,
-                                        uncheckedColor = TextSecondary,
-                                        checkmarkColor = MaterialTheme.colorScheme.background
-                                    )
+                                Text(
+                                    text = "Inayon amin a nasarakan (${filteredSongsToAdd.size})",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Column {
-                                    Text(text = song.title, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Medium)
-                                    Text(text = song.artist, color = TextSecondary, fontSize = 12.sp)
+                            }
+                        }
+
+                        if (filteredSongsToAdd.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().height(100.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = "Awan ti nasarakan a kanta.", color = TextSecondary)
+                            }
+                        } else {
+                            LazyColumn(modifier = Modifier.heightIn(max = 240.dp)) {
+                                items(filteredSongsToAdd) { song ->
+                                    val isSelected = selectedSongs.contains(song)
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                if (isSelected) selectedSongs.remove(song) else selectedSongs.add(song)
+                                            }
+                                            .padding(vertical = 12.dp, horizontal = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Checkbox(
+                                            checked = isSelected,
+                                            onCheckedChange = { checked ->
+                                                if (checked == true) selectedSongs.add(song) else selectedSongs.remove(song)
+                                            },
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = PrimaryGold,
+                                                uncheckedColor = TextSecondary,
+                                                checkmarkColor = MaterialTheme.colorScheme.background
+                                            )
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Column {
+                                            Text(text = song.title, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Medium)
+                                            Text(text = song.artist, color = TextSecondary, fontSize = 12.sp)
+                                        }
+                                    }
+                                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                                 }
                             }
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                         }
                     }
                 }
