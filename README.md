@@ -10,6 +10,7 @@
 * **Full-Screen Spotify-Style Lyrics**: 
   * Access lyrics via the playback kebab menu (**`Liriko`**).
   * Opens a beautiful full-screen scrollable lyrics sheet with large bold typography and a vertical gradient them.
+  * Finds the lyrics for you online or paste the lyrics.
 * **Settings Dashboard**:
   * **Rupan Kansion (App Theme)**: Light/Dark mode toggle (saved to preferences to persist across app restarts).
   * **Oras ti Turog (Sleep Timer)**: Configurable background sleep timer (15m, 30m, 45m, 60m) with a real-time countdown.
