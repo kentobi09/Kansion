@@ -1,6 +1,6 @@
 # Kansion - Ilokano Offline Music Player
 
-**Kansion** is an elegant, premium offline music player built for Android. The entire application is fully localized in the **Ilokano dialect**, providing a tailored, familiar experience for Ilokano-speaking users. It features a slate-black and golden aesthetic, highlighted by a tactile rotating vinyl record interface.
+**Kansion** is a premium, distraction-free offline music player for Android, fully localized in the **Ilokano dialect**. It features a modern slate-black and gold aesthetic with an immersive full-screen lyrics visualizer, dynamic OPM-optimized fallback search, and an interactive rotating vinyl interface. Designed with simplicity in mind, it provides a tailored, familiar listening experience for the Ilokano-speaking community.
 
 [![Download APK](https://img.shields.io/badge/📥_Download_APK-latest-F59E0B?style=for-the-badge&logo=android&logoColor=white)](https://github.com/kentobi09/Kansion/raw/main/kansion.apk)
 
