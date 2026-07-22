@@ -22,7 +22,7 @@ object LyricsSearchService {
             return@withContext lyrics
         }
 
-        // 2. Try Lyrist fallback
+        // 2. Try Lyrist fallback (queries Genius/Musixmatch)
         lyrics = searchLyrist(parsedArtist, parsedTitle)
         if (!lyrics.isNullOrBlank()) {
             return@withContext lyrics
@@ -30,6 +30,12 @@ object LyricsSearchService {
 
         // 3. Try Lyrics.ovh fallback
         lyrics = searchLyricsOvh(parsedArtist, parsedTitle)
+        if (!lyrics.isNullOrBlank()) {
+            return@withContext lyrics
+        }
+
+        // 4. Try Lyrix fallback (specifically queries Musixmatch/Spotify OPM lyrics)
+        lyrics = searchLyrix(parsedArtist, parsedTitle)
         if (!lyrics.isNullOrBlank()) {
             return@withContext lyrics
         }
@@ -114,6 +120,39 @@ object LyricsSearchService {
             val encodedArtist = URLEncoder.encode(artist, "UTF-8")
             val encodedTitle = URLEncoder.encode(title, "UTF-8")
             val urlString = "https://api.lyrics.ovh/v1/$encodedArtist/$encodedTitle"
+            val url = URL(urlString)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 5000
+            connection.readTimeout = 5000
+
+            val responseCode = connection.responseCode
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                val reader = BufferedReader(InputStreamReader(connection.inputStream))
+                val response = StringBuilder()
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    response.append(line)
+                }
+                reader.close()
+
+                val jsonObject = JSONObject(response.toString())
+                val lyrics = jsonObject.optString("lyrics")
+                if (!lyrics.isNullOrBlank() && lyrics != "null") {
+                    return lyrics
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    private fun searchLyrix(artist: String, title: String): String? {
+        try {
+            val encodedArtist = URLEncoder.encode(artist, "UTF-8")
+            val encodedTitle = URLEncoder.encode(title, "UTF-8")
+            val urlString = "https://lyrix.vercel.app/getLyricsByName/$encodedArtist/$encodedTitle"
             val url = URL(urlString)
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
