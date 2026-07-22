@@ -53,38 +53,48 @@ object LyricsSearchService {
     }
 
     fun cleanQueryString(title: String, artist: String): String {
-        // 1. Clean brackets like (Official Video), [Lyrics], etc. and extensions from title
-        var cleanTitle = title
+        // 1. Replace underscores with spaces
+        val baseTitle = title.replace('_', ' ')
+        val baseArtist = artist.replace('_', ' ')
+
+        // 2. Clean brackets like (Official Video), [Lyrics], etc. and extensions from title
+        val cleanTitle = baseTitle
             .replace(Regex("(?i)\\s*[\\[(](official|lyrics|video|audio|hd|lyric|remastered|cover|live|music\\s*video)[\\])]"), "")
             .replace(Regex("(?i)\\.mp3$|\\.wav$|\\.m4a$"), "")
             .trim()
 
-        val isArtistUnknown = artist.isBlank() || 
-                artist.equals("<unknown>", ignoreCase = true) || 
-                artist.equals("unknown", ignoreCase = true) || 
-                artist.equals("unknown artist", ignoreCase = true) || 
-                artist.equals("Di am-ammo nga Agkankansion", ignoreCase = true)
+        val isArtistUnknown = baseArtist.isBlank() || 
+                baseArtist.equals("<unknown>", ignoreCase = true) || 
+                baseArtist.equals("unknown", ignoreCase = true) || 
+                baseArtist.equals("unknown artist", ignoreCase = true) || 
+                baseArtist.equals("Di am-ammo nga Agkankansion", ignoreCase = true)
 
-        if (isArtistUnknown) {
+        val rawResult = if (isArtistUnknown) {
             // Try parsing the title
             if (cleanTitle.contains(" - ")) {
                 val parts = cleanTitle.split(" - ", limit = 2)
                 val parsedArtist = parts[0].trim()
                 val parsedTitle = parts[1].trim()
-                return "$parsedArtist $parsedTitle"
+                "$parsedArtist $parsedTitle"
             } else if (cleanTitle.contains(" by ", ignoreCase = true)) {
                 val parts = cleanTitle.split(Regex("(?i)\\s+by\\s+"), 2)
                 val parsedTitle = parts[0].trim()
                 val parsedArtist = parts[1].trim()
-                return "$parsedArtist $parsedTitle"
+                "$parsedArtist $parsedTitle"
+            } else {
+                cleanTitle
             }
-            return cleanTitle
+        } else {
+            val cleanArtist = baseArtist
+                .replace(Regex("(?i)\\s*[\\[(](official|video|audio|hd)[\\])]"), "")
+                .trim()
+            "$cleanArtist $cleanTitle"
         }
 
-        val cleanArtist = artist
-            .replace(Regex("(?i)\\s*[\\[(](official|video|audio|hd)[\\])]"), "")
+        // 3. Final Sanitize: Remove special characters and clean extra spacing
+        return rawResult
+            .replace(Regex("[~*+=/\\\\\"?!,@#%^&;:|]"), " ") // Remove weird special chars
+            .replace(Regex("\\s+"), " ")                     // Normalize spaces
             .trim()
-
-        return "$cleanArtist $cleanTitle"
     }
 }
