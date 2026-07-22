@@ -23,7 +23,7 @@
   * **Oras ti Turog (Sleep Timer)**: Configurable background sleep timer (15m, 30m, 45m, 60m) with a real-time countdown.
   * **Sukiren manen dagiti kansion (Rescan)**: Instantly rescans local files to update the audio library.
   * **Pukawen ti Data (Reset Data)**: Localized warning dialog to securely wipe database playlists and queue states.
-* **Simultaneous Playback**: Disabled automatic audio focus pause constraints. You can play your local music continuously in the background—even during active voice/video calls.
+* **Simultaneous Playback**: Disabled automatic audio focus pause constraints. You can play your local music continuously in the background—even during active voice/video calls or even with other applications playing sound.
 * **Headphone Unplug Pausing**: Automatically pauses playback when headphones are unplugged to prevent accidental speaker output.
 
 ---
