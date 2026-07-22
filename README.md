@@ -1,6 +1,10 @@
+<div align="center">
+  <img src="https://github.com/kentobi09/Kansion/blob/main/app/src/main/res/drawable/ic_logo.png?raw=true" alt="Kansion Logo" width="120" height="120" />
+</div>
+
 # Kansion - Ilokano Offline Music Player
 
-**Kansion** is a premium, distraction-free offline music player for Android, fully localized in the **Ilokano dialect**. It features a modern slate-black and gold aesthetic with an immersive full-screen lyrics visualizer, dynamic OPM-optimized fallback search, and an interactive rotating vinyl interface. Designed with simplicity in mind, it provides a tailored, familiar listening experience for the Ilokano-speaking community.
+**Kansion** is a premium, distraction-free offline music player for Android, fully localized in the **Ilokano dialect**. It features a modern slate-black and gold aesthetic with an immersive full-screen lyrics experience and native language support.
 
 [![Download APK](https://img.shields.io/badge/📥_Download_APK-latest-F59E0B?style=for-the-badge&logo=android&logoColor=white)](https://github.com/kentobi09/Kansion/raw/main/kansion.apk)
 
@@ -10,7 +14,7 @@
 
 ## 📱 Features
 
-* **Dialect Localization**: Native Ilokano phrasing across the interface (e.g., *Kankansion* for Songs, *Listaan* for Playlists, *Ur-uray* for Queue, *Pinagpaut* for Duration, *Denggeg* for Volume).
+* **Dialect Localization**: Native Ilokano phrasing across the interface (e.g., *Kankansion* for Songs, *Listaan* for Playlists, *Ur-uray* for Queue, *Pinagpaut* for Duration, *Denggeg* for Volume, *Patanor* for Repeat).
 * **Full-Screen Spotify-Style Lyrics**: 
   * Access lyrics via the playback kebab menu (**`Liriko`**).
   * Opens a beautiful full-screen scrollable lyrics sheet with large bold typography and a vertical gradient them.
@@ -18,7 +22,7 @@
 * **Settings Dashboard**:
   * **Rupan Kansion (App Theme)**: Light/Dark mode toggle (saved to preferences to persist across app restarts).
   * **Oras ti Turog (Sleep Timer)**: Configurable background sleep timer (15m, 30m, 45m, 60m) with a real-time countdown.
-* **Simultaneous Playback**: Disabled automatic audio focus pause constraints. You can play your local music continuously in the background—even during active voice/video calls or even with other applications playing sound.
+* **Simultaneous Playback**: Disabled automatic audio focus pause constraints. You can play your local music continuously in the background—even during active voice/video calls or even with other media apps open.
 
 ---
 
