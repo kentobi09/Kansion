@@ -2,6 +2,10 @@
 
 **Kansion** is an elegant, premium offline music player built for Android. The entire application is fully localized in the **Ilokano dialect**, providing a tailored, familiar experience for Ilokano-speaking users. It features a slate-black and golden aesthetic, highlighted by a tactile rotating vinyl record interface.
 
+[![Download APK](https://img.shields.io/badge/📥_Download_APK-latest-F59E0B?style=for-the-badge&logo=android&logoColor=white)](https://github.com/kentobi09/Kansion/raw/main/kansion.apk)
+
+[**👉 Click here to Download the latest Kansion APK**](https://github.com/kentobi09/Kansion/raw/main/kansion.apk)
+
 ---
 
 ## 📱 Features
@@ -18,6 +22,14 @@
 
 ---
 
+## 📥 Quick Download & Installation
+
+1. **Download APK**: Click the [**Download APK Badge**](https://github.com/kentobi09/Kansion/raw/main/kansion.apk) or [**Direct Link**](https://github.com/kentobi09/Kansion/raw/main/kansion.apk) above on your Android phone.
+2. **Install**: Tap the downloaded `kansion.apk` file to install it. (You may need to tap "Install Anyway" if prompted by Play Protect).
+3. **Enjoy**: Open **Kansion** and enjoy your local offline music with lyrics and native translation!
+
+---
+
 ## 🛠️ Tech Stack
 
 * **Language**: Kotlin
@@ -29,14 +41,19 @@
 
 ---
 
-## 📦 How to Build & Run
+## 🚀 Building from Source
 
-### Running the precompiled APK
-A signed release package is compiled and available at the root directory for easy installation:
-👉 **[kansion.apk](kansion.apk)**
+### Prerequisites
+* [Android Studio](https://developer.android.com/studio) (Hedgehog or newer)
+* Android Device or Emulator running Android 8.0+
 
-### Opening in Android Studio
-1. Clone the repository and open Android Studio.
-2. Select **File ➔ Open...** and target the project folder.
-3. Wait for the automatic Gradle Sync to complete.
-4. Press the green **Run (▶)** button to deploy to an emulator or connected physical device.
+### Steps
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/kentobi09/Kansion.git
+   ```
+2. **Open in Android Studio**:
+   - Open Android Studio -> **Open** -> Select the `kansion` project folder.
+3. **Build and Run**:
+   - Connect your Android device via USB.
+   - Press the green **Run (▶)** button to compile and install on your phone.
