@@ -12,7 +12,7 @@ import java.net.URLEncoder
 object LyricsSearchService {
 
     suspend fun searchLyrics(title: String, artist: String): String? = withContext(Dispatchers.IO) {
-        val query = "$title $artist".trim()
+        val query = cleanQueryString(title, artist)
         if (query.isEmpty()) return@withContext null
 
         try {
@@ -50,5 +50,41 @@ object LyricsSearchService {
             e.printStackTrace()
         }
         return@withContext null
+    }
+
+    fun cleanQueryString(title: String, artist: String): String {
+        // 1. Clean brackets like (Official Video), [Lyrics], etc. and extensions from title
+        var cleanTitle = title
+            .replace(Regex("(?i)\\s*[\\[(](official|lyrics|video|audio|hd|lyric|remastered|cover|live|music\\s*video)[\\])]"), "")
+            .replace(Regex("(?i)\\.mp3$|\\.wav$|\\.m4a$"), "")
+            .trim()
+
+        val isArtistUnknown = artist.isBlank() || 
+                artist.equals("<unknown>", ignoreCase = true) || 
+                artist.equals("unknown", ignoreCase = true) || 
+                artist.equals("unknown artist", ignoreCase = true) || 
+                artist.equals("Di am-ammo nga Agkankansion", ignoreCase = true)
+
+        if (isArtistUnknown) {
+            // Try parsing the title
+            if (cleanTitle.contains(" - ")) {
+                val parts = cleanTitle.split(" - ", limit = 2)
+                val parsedArtist = parts[0].trim()
+                val parsedTitle = parts[1].trim()
+                return "$parsedArtist $parsedTitle"
+            } else if (cleanTitle.contains(" by ", ignoreCase = true)) {
+                val parts = cleanTitle.split(Regex("(?i)\\s+by\\s+"), 2)
+                val parsedTitle = parts[0].trim()
+                val parsedArtist = parts[1].trim()
+                return "$parsedArtist $parsedTitle"
+            }
+            return cleanTitle
+        }
+
+        val cleanArtist = artist
+            .replace(Regex("(?i)\\s*[\\[(](official|video|audio|hd)[\\])]"), "")
+            .trim()
+
+        return "$cleanArtist $cleanTitle"
     }
 }
