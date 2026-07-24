@@ -12,7 +12,7 @@
 
 ---
 
-## 📱 Features
+## Features
 
 * **Dialect Localization**: Native Ilokano phrasing across the interface (e.g., *Kankansion* for Songs, *Listaan* for Playlists, *Ur-uray* for Queue, *Pinagpaut* for Duration, *Denggeg* for Volume, *Patanor* for Repeat).
 * **Full-Screen Spotify-Style Lyrics**: 
@@ -26,7 +26,7 @@
 
 ---
 
-## 📥 Quick Download & Installation
+## Quick Download & Installation
 
 1. **Download APK**: Click the [**Download APK Badge**](https://github.com/kentobi09/Kansion/raw/main/kansion.apk) or [**Direct Link**](https://github.com/kentobi09/Kansion/raw/main/kansion.apk) above on your Android phone.
 2. **Install**: Tap the downloaded `kansion.apk` file to install it. (You may need to tap "Install Anyway" if prompted by Play Protect).
@@ -45,7 +45,7 @@
 
 ---
 
-## 🚀 Building from Source
+##  Building from Source
 
 ### Prerequisites
 * [Android Studio](https://developer.android.com/studio) (Hedgehog or newer)
